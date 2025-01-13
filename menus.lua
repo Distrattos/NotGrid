@@ -392,6 +392,16 @@ local menuarray = {
 	{text = "",},
 
 	{text = "Companions",},
+	{text = L["Skip Companion"],
+	 toggle = "skipcompanion",
+	},
+	{text = L["Companion/Player Border"],
+	 slider = {
+		 key = "companionborder",
+		 minval = 2,
+		 maxval = 20,
+	 },
+	},
 	{text = L["Highlight Companion"],
 	 toggle = "highlightcompanion",
 	 color = {

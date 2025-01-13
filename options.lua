@@ -116,6 +116,8 @@ local DefaultOptions = {
 	["showmenuhint"] = true,
 
 	-- Companions
+	["skipcompanion"] = false,
+	["companionborder"] = 2,
 	["highlightcompanion"] = false,
 	["companioncolor"] = {255/255,255/255,0/255,1},
 	["highlightyourcompanion"] = false,

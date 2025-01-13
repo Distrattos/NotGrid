@@ -317,21 +317,23 @@ function NotGrid:UNIT_BORDER(unitid)
 		elseif o.trackmana and UnitPowerType(unitid) == 0 and currmana/maxmana*100 < o.manathreshhold and not UnitIsDeadOrGhost(unitid) then
 			f.border:SetBackdropBorderColor(unpack(o.manawarningcolor))
 			f.border.middleart:SetVertexColor(unpack(o.manawarningcolor))
-		-- Companion color should be able to co-exist with other borders, planned to be moved into own stacking border
-		elseif o.highlightcompanion and isCompanion then
-			if o.highlightyourcompanion and isYourCompanion then
-				f.border:SetBackdropBorderColor(unpack(o.yourcompanioncolor))
-				f.border.middleart:SetVertexColor(unpack(o.yourcompanioncolor))
-			else
-				f.border:SetBackdropBorderColor(unpack(o.companioncolor))
-				f.border.middleart:SetVertexColor(unpack(o.companioncolor))
-			end
-		elseif o.highlightplayer and not isCompanion then
-			f.border:SetBackdropBorderColor(unpack(o.playercolor))
-			f.border.middleart:SetVertexColor(unpack(o.playercolor))
 		else
 			f.border:SetBackdropBorderColor(unpack(o.unitbordercolor))
 			f.border.middleart:SetVertexColor(unpack(o.unitbordercolor))
+		end
+
+		if not o.skipcompanion then
+			-- Companion color should be able to co-exist with other borders, planned to be moved into own stacking border
+			if o.highlightyourcompanion and isYourCompanion then
+				f.companionborder:SetBackdropBorderColor(unpack(o.yourcompanioncolor))
+				f.companionborder.middleart:SetVertexColor(unpack(o.yourcompanioncolor))
+			elseif o.highlightcompanion and isCompanion then
+				f.companionborder:SetBackdropBorderColor(unpack(o.companioncolor))
+				f.companionborder.middleart:SetVertexColor(unpack(o.companioncolor))
+			elseif o.highlightplayer and not isCompanion then
+				f.companionborder:SetBackdropBorderColor(unpack(o.playercolor))
+				f.companionborder.middleart:SetVertexColor(unpack(o.playercolor))
+			end
 		end
 	end
 end

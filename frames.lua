@@ -41,6 +41,9 @@ function NotGrid:CreateUnitFrame(unitid,raidindex)
 	f.border = CreateFrame("Frame","$parentborder",f) -- make a seperate frame for the edgefile/border for better customization possibilities
 	f.border.middleart = f.border:CreateTexture("NGArtworkMiddle", "ARTWORK")
 
+	f.companionborder = CreateFrame("Frame","$companionborder",f) -- make a seperate frame for the edgefile/border for better customization possibilities
+	f.companionborder.middleart = f.border:CreateTexture("NGArtworkMiddle", "ARTWORK")
+
 	f.healthbar = CreateFrame("StatusBar","$parenthealthbar",f)
 	f.healthbar.bgtex = f.healthbar:CreateTexture("$parentbgtex","BACKGROUND")
 
@@ -134,6 +137,20 @@ function NotGrid:CreateUnitFrame(unitid,raidindex)
 	return f
 end
 
+function NotGrid:GetUnitBorderSize()
+	local o = self.o
+	return o.unitborder + self:GetCompanionBorderSize()
+end
+
+function NotGrid:GetCompanionBorderSize()
+	local o = self.o
+	if (o.highlightcompanion or o.highlightyourcompanion or o.highlightplayer) then
+		return o.companionborder
+	else
+		return 1
+	end
+end
+
 -------------------
 -- Config Frames --
 -------------------
@@ -158,14 +175,18 @@ function NotGrid:ConfigUnitFrames() -- this can get called on every setting chan
 		f:SetBackdrop({bgFile = "Interface\\Buttons\\WHITE8X8", tile = true, tileSize = 16})
 		f:SetBackdropColor(unpack(o.unitbgcolor))
 
+		local bordersize = self:GetUnitBorderSize()
+		local companionbordersize = self:GetCompanionBorderSize()
+
+		--BORDER
 		if o.borderartwork then
-			f.border:SetWidth(width+o.unitborder) -- the way edgefile works is it basically sits on the center of the edge of the frame and expands both inward and outward. So to compensate asthetically for that I ahve to increase the size of my frame double the desired width of the edgefile/border
-			f.border:SetHeight(height+o.unitborder)
+			f.border:SetWidth(width+bordersize) -- the way edgefile works is it basically sits on the center of the edge of the frame and expands both inward and outward. So to compensate asthetically for that I ahve to increase the size of my frame double the desired width of the edgefile/border
+			f.border:SetHeight(height+bordersize)
 			f.border:SetBackdrop({edgeFile = "Interface\\AddOns\\NotGrid\\media\\borderartwork", edgeSize = 16})
 		else
-			f.border:SetWidth(width+o.unitborder*2) -- the way edgefile works is it basically sits on the center of the edge of the frame and expands both inward and outward. So to compensate asthetically for that I ahve to increase the size of my frame double the desired width of the edgefile/border
-			f.border:SetHeight(height+o.unitborder*2)
-			f.border:SetBackdrop({edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = o.unitborder})
+			f.border:SetWidth(width+bordersize*2) -- the way edgefile works is it basically sits on the center of the edge of the frame and expands both inward and outward. So to compensate asthetically for that I ahve to increase the size of my frame double the desired width of the edgefile/border
+			f.border:SetHeight(height+bordersize*2)
+			f.border:SetBackdrop({edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = bordersize})
 		end
 		f.border:SetBackdropBorderColor(unpack(o.unitbordercolor))
 		f.border:SetPoint("CENTER",0,0)
@@ -180,6 +201,26 @@ function NotGrid:ConfigUnitFrames() -- this can get called on every setting chan
 		end
 
 
+		-- COMPANIONBORDER
+		if not o.skipcompanion then
+			f.companionborder:SetWidth(width+companionbordersize*2) -- the way edgefile works is it basically sits on the center of the edge of the frame and expands both inward and outward. So to compensate asthetically for that I ahve to increase the size of my frame double the desired width of the edgefile/border
+			f.companionborder:SetHeight(height+companionbordersize*2)
+			f.companionborder:SetBackdrop({edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = o.companionborder})
+			f.companionborder:SetBackdropBorderColor(unpack(o.unitbordercolor))
+			f.companionborder:SetPoint("CENTER",0,0)
+			f.companionborder:SetFrameLevel(f:GetFrameLevel() + 3)
+			f.companionborder.middleart:SetTexture("Interface/TargetingFrame/UI-TargetingFrame")
+			--if o.powerposition <= 2 then
+			--	f.companionborder.middleart:SetTexCoord((58/256)+(1/256/2), (82/256)+(1/256/2), (39/128)+(1/128/2), (44/128)+(1/128/2))
+			--	f.companionborder.middleart:SetVertexColor(unpack(o.unitbordercolor))
+			--else
+			--	f.companionborder.middleart:SetTexCoord((26/256)+(1/256/2), (32/256)+(1/256/2), (27/128)+(1/128/2), (34/128)+(1/128/2))
+			--	f.companionborder.middleart:SetVertexColor(unpack(o.unitbordercolor))
+			--end
+		end
+
+
+		-- HEALTBAR
 		f.healthbar:SetWidth(o.unitwidth)
 		f.healthbar:SetHeight(o.unitheight)
 		if o.unithealthorientation == 1 then
@@ -197,6 +238,7 @@ function NotGrid:ConfigUnitFrames() -- this can get called on every setting chan
 		f.healthbar:ClearAllPoints()
 		f.powerbar:ClearAllPoints()
 		f.border.middleart:ClearAllPoints()
+		f.companionborder.middleart:ClearAllPoints()
 		if o.showpowerbar then
 			if o.powerposition <= 2 then -- power on top
 				if o.powerposition == 1 then
@@ -306,6 +348,9 @@ function NotGrid:PositionFrames()
 	local TotalGroups = 0
 	local TotalUnits = 0
 	local o = self.o
+
+	local bordersize = self:GetUnitBorderSize()
+	local companionbordersize = self:GetCompanionBorderSize()
 
 	local powermodx = 0 -- so I can interject the width of the powerbar into the positioning calcs without doing a million more conditionals
 	local powermody = 0

@@ -60,6 +60,8 @@ L:RegisterTranslations("enUS", function() return {
 ["Draggable"] = true,
 
 --Companions related
+["Skip Companion"] = true,
+["Companion/Player Border"] = true,
 ["Companions"] = true,
 ["Highlight Companion"] = true,
 ["Highlight Your Companion"] = true,
