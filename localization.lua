@@ -59,6 +59,12 @@ L:RegisterTranslations("enUS", function() return {
 ["Version Checking"] = true,
 ["Draggable"] = true,
 
+--Companions related
+["Companions"] = true,
+["Highlight Companion"] = true,
+["Highlight Your Companion"] = true,
+["Highlight Player"] = true,
+
 ["CombatEvents"] = {
 	["CHAT_MSG_SPELL_PERIODIC_PARTY_BUFFS"] = "(%a+) gains %a.+", --%a on the last just to make sure its not a digit
 	["CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE"] = "(%a+) is afflicted by .+",

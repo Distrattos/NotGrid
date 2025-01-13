@@ -114,6 +114,14 @@ local DefaultOptions = {
 
 	["draggable"] = false,
 	["showmenuhint"] = true,
+
+	-- Companions
+	["highlightcompanion"] = false,
+	["companioncolor"] = {255/255,255/255,0/255,1},
+	["highlightyourcompanion"] = false,
+	["yourcompanioncolor"] = {255/255,0/255,255/255,1},
+	["highlightplayer"] = false,
+	["playercolor"] = {0/255,255/255,255/255,1},
 }
 
 function NotGrid:SetDefaultOptions() -- this will run on initialization and make sure everything is set. We can also use it if we wipe the NotGridOptions table and want to load it up with defaults

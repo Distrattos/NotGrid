@@ -391,6 +391,28 @@ local menuarray = {
 
 	{text = "",},
 
+	{text = "Companions",},
+	{text = L["Highlight Companion"],
+	 toggle = "highlightcompanion",
+	 color = {
+		 key = "companioncolor",
+	 },
+	},
+	{text = L["Highlight Your Companion"],
+	 toggle = "highlightyourcompanion",
+	 color = {
+		 key = "yourcompanioncolor",
+	 },
+	},
+	{text = L["Highlight Player"],
+	 toggle = "highlightplayer",
+	 color = {
+		 key = "playercolor",
+	 },
+	},
+
+	{text = "",},
+
 	{text = L["Version Checking"],
 	toggle = "versionchecking",
 	},

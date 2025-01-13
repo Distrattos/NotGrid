@@ -295,8 +295,16 @@ end
 function NotGrid:UNIT_BORDER(unitid)
 	local o = self.o
 	local f = self.UnitFrames[unitid]
+
+	self:GetAllCompanionsMap()
+	self:GetYourCompanionsMap()
+
 	if f and UnitExists(unitid) then
 		local name = UnitName(unitid)
+
+		local isYourCompanion = self.YourCompanionMap[name]
+		local isCompanion = self.AllCompanionMap[name]
+
 		local targetname = UnitName("Target") -- could get erronous with pets
 		local currmana = UnitMana(unitid)
 		local maxmana = UnitManaMax(unitid)
@@ -309,6 +317,18 @@ function NotGrid:UNIT_BORDER(unitid)
 		elseif o.trackmana and UnitPowerType(unitid) == 0 and currmana/maxmana*100 < o.manathreshhold and not UnitIsDeadOrGhost(unitid) then
 			f.border:SetBackdropBorderColor(unpack(o.manawarningcolor))
 			f.border.middleart:SetVertexColor(unpack(o.manawarningcolor))
+		-- Companion color should be able to co-exist with other borders, planned to be moved into own stacking border
+		elseif o.highlightcompanion and isCompanion then
+			if o.highlightyourcompanion and isYourCompanion then
+				f.border:SetBackdropBorderColor(unpack(o.yourcompanioncolor))
+				f.border.middleart:SetVertexColor(unpack(o.yourcompanioncolor))
+			else
+				f.border:SetBackdropBorderColor(unpack(o.companioncolor))
+				f.border.middleart:SetVertexColor(unpack(o.companioncolor))
+			end
+		elseif o.highlightplayer and not isCompanion then
+			f.border:SetBackdropBorderColor(unpack(o.playercolor))
+			f.border.middleart:SetVertexColor(unpack(o.playercolor))
 		else
 			f.border:SetBackdropBorderColor(unpack(o.unitbordercolor))
 			f.border.middleart:SetVertexColor(unpack(o.unitbordercolor))
