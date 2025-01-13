@@ -205,7 +205,7 @@ function NotGrid:ConfigUnitFrames() -- this can get called on every setting chan
 		if not o.skipcompanion then
 			f.companionborder:SetWidth(width+companionbordersize*2) -- the way edgefile works is it basically sits on the center of the edge of the frame and expands both inward and outward. So to compensate asthetically for that I ahve to increase the size of my frame double the desired width of the edgefile/border
 			f.companionborder:SetHeight(height+companionbordersize*2)
-			f.companionborder:SetBackdrop({edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = o.companionborder})
+			f.companionborder:SetBackdrop({edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = companionbordersize})
 			f.companionborder:SetBackdropBorderColor(unpack(o.unitbordercolor))
 			f.companionborder:SetPoint("CENTER",0,0)
 			f.companionborder:SetFrameLevel(f:GetFrameLevel() + 3)
