@@ -111,6 +111,31 @@ function NotGrid:UNIT_MAIN(unitid)
 			f.healthbar.bgtex:SetVertexColor(color.r, color.g, color.b)
 		end
 
+		-- Companion name color
+		if self:IsPlayingWithCompanions() then
+
+			self:GetAllCompanionsMap()
+			self:GetYourCompanionsMap()
+
+			local isYourCompanion = self.YourCompanionMap[name]
+			local isCompanion = self.AllCompanionMap[name]
+
+			if o.highlightcompanionname then
+				local highlightcolor = {}
+				-- Companion color should be able to co-exist with other borders, planned to be moved into own stacking border
+				if o.highlightyourcompanion and isYourCompanion then
+					highlightcolor.r,highlightcolor.g,highlightcolor.b = unpack(o.yourcompanioncolor)
+					f.namehealthtext:SetTextColor(highlightcolor.r, highlightcolor.g, highlightcolor.b, o.yourcompanioncolor[4])
+				elseif o.highlightcompanion and isCompanion then
+					highlightcolor.r,highlightcolor.g,highlightcolor.b = unpack(o.companioncolor)
+					f.namehealthtext:SetTextColor(highlightcolor.r, highlightcolor.g, highlightcolor.b, o.companioncolor[4])
+				elseif o.highlightplayer and not isCompanion then
+					highlightcolor.r,highlightcolor.g,highlightcolor.b = unpack(o.playercolor)
+					f.namehealthtext:SetTextColor(highlightcolor.r, highlightcolor.g, highlightcolor.b, o.playercolor[4])
+				end
+			end
+		end
+
 		f.powerbar:SetStatusBarColor(pcolor.r, pcolor.g, pcolor.b)
 		if o.colorpowerbarbgbytype then
 			f.powerbar.bgtex:SetVertexColor(pcolor.r, pcolor.g, pcolor.b)
@@ -296,14 +321,8 @@ function NotGrid:UNIT_BORDER(unitid)
 	local o = self.o
 	local f = self.UnitFrames[unitid]
 
-	self:GetAllCompanionsMap()
-	self:GetYourCompanionsMap()
-
 	if f and UnitExists(unitid) then
 		local name = UnitName(unitid)
-
-		local isYourCompanion = self.YourCompanionMap[name]
-		local isCompanion = self.AllCompanionMap[name]
 
 		local targetname = UnitName("Target") -- could get erronous with pets
 		local currmana = UnitMana(unitid)
@@ -322,7 +341,13 @@ function NotGrid:UNIT_BORDER(unitid)
 			f.border.middleart:SetVertexColor(unpack(o.unitbordercolor))
 		end
 
-		if not o.skipcompanion then
+		if self:IsPlayingWithCompanions() then
+
+			self:GetAllCompanionsMap()
+			self:GetYourCompanionsMap()
+			local isYourCompanion = self.YourCompanionMap[name]
+			local isCompanion = self.AllCompanionMap[name]
+
 			-- Companion color should be able to co-exist with other borders, planned to be moved into own stacking border
 			if o.highlightyourcompanion and isYourCompanion then
 				f.companionborder:SetBackdropBorderColor(unpack(o.yourcompanioncolor))

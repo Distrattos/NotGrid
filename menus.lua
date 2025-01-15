@@ -391,16 +391,19 @@ local menuarray = {
 
 	{text = "",},
 
+	--  COMPANION START
+
 	{text = "Companions",},
-	{text = L["Skip Companion"],
-	 toggle = "skipcompanion",
-	},
 	{text = L["Companion/Player Border"],
+	 toggle = "highlightcompanionborder",
 	 slider = {
 		 key = "companionborder",
 		 minval = 2,
 		 maxval = 20,
 	 },
+	},
+	{text = L["Companion/Player Name"],
+	 toggle = "highlightcompanionname",
 	},
 	{text = L["Highlight Companion"],
 	 toggle = "highlightcompanion",
@@ -420,6 +423,8 @@ local menuarray = {
 		 key = "playercolor",
 	 },
 	},
+
+	--  COMPANION END
 
 	{text = "",},
 

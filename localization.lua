@@ -62,6 +62,7 @@ L:RegisterTranslations("enUS", function() return {
 --Companions related
 ["Skip Companion"] = true,
 ["Companion/Player Border"] = true,
+["Companion/Player Name"] = true,
 ["Companions"] = true,
 ["Highlight Companion"] = true,
 ["Highlight Your Companion"] = true,

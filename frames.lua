@@ -139,12 +139,17 @@ end
 
 function NotGrid:GetUnitBorderSize()
 	local o = self.o
+
+	if not self:IsPlayingWithCompanions() then
+		return o.unitborder
+	end
+
 	return o.unitborder + self:GetCompanionBorderSize()
 end
 
 function NotGrid:GetCompanionBorderSize()
 	local o = self.o
-	if (o.highlightcompanion or o.highlightyourcompanion or o.highlightplayer) then
+	if o.highlightcompanionborder and (o.highlightcompanion or o.highlightyourcompanion or o.highlightplayer) then
 		return o.companionborder
 	else
 		return 1
@@ -202,7 +207,8 @@ function NotGrid:ConfigUnitFrames() -- this can get called on every setting chan
 
 
 		-- COMPANIONBORDER
-		if not o.skipcompanion then
+		if self:IsPlayingWithCompanions() and o.highlightcompanionborder then
+			f.companionborder:Show()
 			f.companionborder:SetWidth(width+companionbordersize*2) -- the way edgefile works is it basically sits on the center of the edge of the frame and expands both inward and outward. So to compensate asthetically for that I ahve to increase the size of my frame double the desired width of the edgefile/border
 			f.companionborder:SetHeight(height+companionbordersize*2)
 			f.companionborder:SetBackdrop({edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = companionbordersize})
@@ -217,6 +223,8 @@ function NotGrid:ConfigUnitFrames() -- this can get called on every setting chan
 			--	f.companionborder.middleart:SetTexCoord((26/256)+(1/256/2), (32/256)+(1/256/2), (27/128)+(1/128/2), (34/128)+(1/128/2))
 			--	f.companionborder.middleart:SetVertexColor(unpack(o.unitbordercolor))
 			--end
+		else
+			f.companionborder:Hide()
 		end
 
 
