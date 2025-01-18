@@ -379,6 +379,11 @@ function NotGrid:UNIT_BORDER(unitid)
 			local isYourCompanion = self.YourCompanionMap[name]
 			local isCompanion = self.AllCompanionMap[name]
 
+			if o.configmode then
+				isYourCompanion = false
+				isCompanion = true
+			end
+
 			-- Companion color should be able to co-exist with other borders, planned to be moved into own stacking border
 			if o.highlightyourcompanion and isYourCompanion then
 				f.companionborder:SetBackdropBorderColor(unpack(o.yourcompanioncolor))

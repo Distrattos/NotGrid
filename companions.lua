@@ -6,14 +6,18 @@ NotGridServerToClient = CreateFrame("Frame",nil,UIParent) -- create a frame that
 NotGridServerToClient:RegisterEvent("CHAT_MSG_ADDON") -- register what events do you want the frame to listen for - in our case we want to listen to messages from the server
 NotGridServerToClient:RegisterEvent("PARTY_MEMBERS_CHANGED")
 NotGridServerToClient:RegisterEvent("PLAYER_ENTERING_WORLD")
+NotGridServerToClient:RegisterEvent("CHAT_MSG_MONSTER_WHISPER") -- Used for transfer/follow from other players
+NotGridServerToClient:RegisterEvent("CHAT_MSG_SYSTEM")
 
 -- GRINFO:ALL:NAMES
 -- GRINFO:SELF:NAMES
 function NotGriend_ClientRequest()
     -- It's necessary to call an OnUpdate function from a frame in order to SendAddonMessages to the server
     NotGridClientToServer:SetScript("OnUpdate", function()
-
+        --DEFAULT_CHAT_FRAME:AddMessage("Requesting ALL companion update from server")
         -- Send the message request to the server
+        AllCompanionMap = { }
+        YourCompanionMap = { }
         SendAddonMessage("nexus", "GRINFO:ALL:NAMES", "BATTLEGROUND")
         SendAddonMessage("nexus", "GRINFO:SELF:NAMES", "BATTLEGROUND")
 
@@ -23,12 +27,67 @@ function NotGriend_ClientRequest()
     end)
 end
 
+function NotGriend_UpdateYourCompanions()
+    -- It's necessary to call an OnUpdate function from a frame in order to SendAddonMessages to the server
+    NotGridClientToServer:SetScript("OnUpdate", function()
+        --DEFAULT_CHAT_FRAME:AddMessage("Requesting YOUR companion update from server")
+        -- Send the message request to the server
+        YourCompanionMap = { }
+        SendAddonMessage("nexus", "GRINFO:SELF:NAMES", "BATTLEGROUND")
+
+        -- Clear the OnUpdate script after it finishes because the job's done and we don't want to spam the server
+        NotGridClientToServer:SetScript("OnUpdate", nil)
+    end)
+end
+
+-- Removes color codes from string, credit to ArkInventory mentioned here : https://us.forums.blizzard.com/en/wow/t/stripping-text-color-from-gametooltip/382517/2
+function StripColorCodes( txt )
+    local txt = txt or ""
+    txt = string.gsub( txt, "|c%x%x%x%x%x%x%x%x", "" )
+    txt = string.gsub( txt, "|c%x%x %x%x%x%x%x", "" ) -- the trading parts colour has a space instead of a zero for some weird reason
+    txt = string.gsub( txt, "|r", "" )
+    return txt
+end
+
 function NotGridServerToClient:OnEvent()
     -- print("SMSG:" .. arg1 .. " arg2:" .. arg2 .. " CHANNEL:" .. arg3 .. " SENDER:" .. arg4)
     -- print(arg1)
 
     if event == "PARTY_MEMBERS_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
         NotGriend_ClientRequest()
+    end
+
+    if event == "CHAT_MSG_MONSTER_WHISPER" then
+        --DEFAULT_CHAT_FRAME:AddMessage("Monster whisper: Arg1: " .. tostring(arg1) .. " - Arg2: " .. tostring(arg2)) -- Add debug print
+        local name = arg2
+        if AllCompanionMap[name] ~= nil then
+            NotGriend_ClientRequest()
+        end
+    end
+
+    if event == "CHAT_MSG_SYSTEM" then
+        --It might be possible to update the AllCompanionMap and YourCompanionMap more directly by parsing these events
+        --The transfer/untransfer would have to update both tables, while follow/unfollow would only need your companions
+        if arg1 then
+            stripArg1 = StripColorCodes(arg1)
+
+            if string.find(stripArg1, "has transferred to") or string.find(stripArg1, "has transferred back to you") then
+                --DEFAULT_CHAT_FRAME:AddMessage("We found transfer event")
+                NotGriend_ClientRequest()
+            end
+
+            -- Match "All Companions will follow [Name]"
+            -- "Companions" and "follow" are colored, preventing direct match
+            if string.find(stripArg1, "All Companions will follow") then
+                --DEFAULT_CHAT_FRAME:AddMessage("We found .z follow event")
+                NotGriend_UpdateYourCompanions()
+            end
+
+            if string.find(stripArg1, "All Companions are back to following you") then
+                --DEFAULT_CHAT_FRAME:AddMessage("We found .z unfollow event")
+                NotGriend_UpdateYourCompanions()
+            end
+        end
     end
 
     -- We are only interested in capturing messages from the server on the addon channel, which is invisible to the players
@@ -110,6 +169,10 @@ function NotGridServerToClient:OnEvent()
                         --DEFAULT_CHAT_FRAME:AddMessage("Adding to YourCompanionMap: " .. name) -- Add debug print
                     end
                 end
+            end
+
+            for unitid,_ in NotGrid.UnitFrames do
+                NotGrid:UNIT_BORDER(unitid)
             end
         end
     end

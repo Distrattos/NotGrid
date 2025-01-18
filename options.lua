@@ -167,6 +167,8 @@ function SlashCmdList.NOTGRID(msg, editbox)
 			NotGridOptions[key] = value
 		end
 		ReloadUI() -- we have to reloadui to make the config menu update as well
+	elseif msg == "scan" or msg == "companion" then
+		NotGriend_ClientRequest()
 	elseif msg == "grid" then
 		NotGrid.o.unithealthbartexture = "Interface\\AddOns\\NotGrid\\media\\GridGradient"
 		NotGrid.o.unithealthbarbgtexture = "Interface\\AddOns\\NotGrid\\media\\GridGradient"

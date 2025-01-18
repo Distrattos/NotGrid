@@ -964,7 +964,6 @@ end
 -------------------------
 
 function NotGridOptionChange()
-	DEFAULT_CHAT_FRAME:AddMessage("NotGridOptionChange")
 	NotGrid:ConfigUnitFrames()
 	for unitid,_ in NotGrid.UnitFrames do
 		NotGrid:UNIT_MAIN(unitid)

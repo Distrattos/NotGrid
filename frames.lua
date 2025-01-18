@@ -217,6 +217,7 @@ function NotGrid:ConfigUnitFrames() -- this can get called on every setting chan
 
 		-- COMPANIONBORDER
 		if self:IsPlayingWithCompanions() and o.highlightcompanionborder then
+			--DEFAULT_CHAT_FRAME:AddMessage("Showing companion border")
 			f.companionborder:Show()
 			f.companionborder:SetWidth(width+companionbordersize*2) -- the way edgefile works is it basically sits on the center of the edge of the frame and expands both inward and outward. So to compensate asthetically for that I ahve to increase the size of my frame double the desired width of the edgefile/border
 			f.companionborder:SetHeight(height+companionbordersize*2)
@@ -225,13 +226,6 @@ function NotGrid:ConfigUnitFrames() -- this can get called on every setting chan
 			f.companionborder:SetPoint("CENTER",0,0)
 			f.companionborder:SetFrameLevel(f:GetFrameLevel() + 3)
 			f.companionborder.middleart:SetTexture("Interface/TargetingFrame/UI-TargetingFrame")
-			--if o.powerposition <= 2 then
-			--	f.companionborder.middleart:SetTexCoord((58/256)+(1/256/2), (82/256)+(1/256/2), (39/128)+(1/128/2), (44/128)+(1/128/2))
-			--	f.companionborder.middleart:SetVertexColor(unpack(o.unitbordercolor))
-			--else
-			--	f.companionborder.middleart:SetTexCoord((26/256)+(1/256/2), (32/256)+(1/256/2), (27/128)+(1/128/2), (34/128)+(1/128/2))
-			--	f.companionborder.middleart:SetVertexColor(unpack(o.unitbordercolor))
-			--end
 		else
 			f.companionborder:Hide()
 		end
@@ -253,7 +247,6 @@ function NotGrid:ConfigUnitFrames() -- this can get called on every setting chan
 
 
 		-- raid target icon
-		DEFAULT_CHAT_FRAME:AddMessage("Configuring raid icon ")
 		f.raidicon:SetWidth(o.raidiconsize)
 		f.raidicon:SetHeight(o.raidiconsize)
 		f.raidicon:SetPoint("CENTER", f.healthbar, "CENTER", o.raidiconoffx, o.raidiconoffy)
