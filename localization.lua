@@ -62,6 +62,15 @@ L:RegisterTranslations("enUS", function() return {
 ["Raid Icon Size"] = true,
 ["Raid Icon Position"] = true,
 
+--Companions related
+["Skip Companion"] = true,
+["Companion/Player Border"] = true,
+["Companion/Player Name"] = true,
+["Companions"] = true,
+["Highlight Companion"] = true,
+["Highlight Your Companion"] = true,
+["Highlight Player"] = true,
+
 ["CombatEvents"] = {
 	["CHAT_MSG_SPELL_PERIODIC_PARTY_BUFFS"] = "(%a+) gains %a.+", --%a on the last just to make sure its not a digit
 	["CHAT_MSG_SPELL_PERIODIC_PARTY_DAMAGE"] = "(%a+) is afflicted by .+",

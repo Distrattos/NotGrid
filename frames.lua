@@ -41,6 +41,9 @@ function NotGrid:CreateUnitFrame(unitid,raidindex)
 	f.border = CreateFrame("Frame","$parentborder",f) -- make a seperate frame for the edgefile/border for better customization possibilities
 	f.border.middleart = f.border:CreateTexture("NGArtworkMiddle", "ARTWORK")
 
+	f.companionborder = CreateFrame("Frame","$companionborder",f) -- make a seperate frame for the edgefile/border for better customization possibilities
+	f.companionborder.middleart = f.border:CreateTexture("NGArtworkMiddle", "ARTWORK")
+
 	f.healthbar = CreateFrame("StatusBar","$parenthealthbar",f)
 	f.healthbar.bgtex = f.healthbar:CreateTexture("$parentbgtex","BACKGROUND")
 
@@ -143,6 +146,25 @@ function NotGrid:CreateUnitFrame(unitid,raidindex)
 	return f
 end
 
+function NotGrid:GetUnitBorderSize()
+	local o = self.o
+
+	if not self:IsPlayingWithCompanions() then
+		return o.unitborder
+	end
+
+	return o.unitborder + self:GetCompanionBorderSize()
+end
+
+function NotGrid:GetCompanionBorderSize()
+	local o = self.o
+	if o.highlightcompanionborder and (o.highlightcompanion or o.highlightyourcompanion or o.highlightplayer) then
+		return o.companionborder
+	else
+		return 1
+	end
+end
+
 -------------------
 -- Config Frames --
 -------------------
@@ -167,14 +189,18 @@ function NotGrid:ConfigUnitFrames() -- this can get called on every setting chan
 		f:SetBackdrop({bgFile = "Interface\\Buttons\\WHITE8X8", tile = true, tileSize = 16})
 		f:SetBackdropColor(unpack(o.unitbgcolor))
 
+		local bordersize = self:GetUnitBorderSize()
+		local companionbordersize = self:GetCompanionBorderSize()
+
+		--BORDER
 		if o.borderartwork then
-			f.border:SetWidth(width+o.unitborder) -- the way edgefile works is it basically sits on the center of the edge of the frame and expands both inward and outward. So to compensate asthetically for that I ahve to increase the size of my frame double the desired width of the edgefile/border
-			f.border:SetHeight(height+o.unitborder)
+			f.border:SetWidth(width+bordersize) -- the way edgefile works is it basically sits on the center of the edge of the frame and expands both inward and outward. So to compensate asthetically for that I ahve to increase the size of my frame double the desired width of the edgefile/border
+			f.border:SetHeight(height+bordersize)
 			f.border:SetBackdrop({edgeFile = "Interface\\AddOns\\NotGrid\\media\\borderartwork", edgeSize = 16})
 		else
-			f.border:SetWidth(width+o.unitborder*2) -- the way edgefile works is it basically sits on the center of the edge of the frame and expands both inward and outward. So to compensate asthetically for that I ahve to increase the size of my frame double the desired width of the edgefile/border
-			f.border:SetHeight(height+o.unitborder*2)
-			f.border:SetBackdrop({edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = o.unitborder})
+			f.border:SetWidth(width+bordersize*2) -- the way edgefile works is it basically sits on the center of the edge of the frame and expands both inward and outward. So to compensate asthetically for that I ahve to increase the size of my frame double the desired width of the edgefile/border
+			f.border:SetHeight(height+bordersize*2)
+			f.border:SetBackdrop({edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = bordersize})
 		end
 		f.border:SetBackdropBorderColor(unpack(o.unitbordercolor))
 		f.border:SetPoint("CENTER",0,0)
@@ -189,6 +215,23 @@ function NotGrid:ConfigUnitFrames() -- this can get called on every setting chan
 		end
 
 
+		-- COMPANIONBORDER
+		if self:IsPlayingWithCompanions() and o.highlightcompanionborder then
+			--DEFAULT_CHAT_FRAME:AddMessage("Showing companion border")
+			f.companionborder:Show()
+			f.companionborder:SetWidth(width+companionbordersize*2) -- the way edgefile works is it basically sits on the center of the edge of the frame and expands both inward and outward. So to compensate asthetically for that I ahve to increase the size of my frame double the desired width of the edgefile/border
+			f.companionborder:SetHeight(height+companionbordersize*2)
+			f.companionborder:SetBackdrop({edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = companionbordersize})
+			f.companionborder:SetBackdropBorderColor(unpack(o.unitbordercolor))
+			f.companionborder:SetPoint("CENTER",0,0)
+			f.companionborder:SetFrameLevel(f:GetFrameLevel() + 3)
+			f.companionborder.middleart:SetTexture("Interface/TargetingFrame/UI-TargetingFrame")
+		else
+			f.companionborder:Hide()
+		end
+
+
+		-- HEALTBAR
 		f.healthbar:SetWidth(o.unitwidth)
 		f.healthbar:SetHeight(o.unitheight)
 		if o.unithealthorientation == 1 then
@@ -204,7 +247,6 @@ function NotGrid:ConfigUnitFrames() -- this can get called on every setting chan
 
 
 		-- raid target icon
-		DEFAULT_CHAT_FRAME:AddMessage("Configuring raid icon ")
 		f.raidicon:SetWidth(o.raidiconsize)
 		f.raidicon:SetHeight(o.raidiconsize)
 		f.raidicon:SetPoint("CENTER", f.healthbar, "CENTER", o.raidiconoffx, o.raidiconoffy)
@@ -217,6 +259,7 @@ function NotGrid:ConfigUnitFrames() -- this can get called on every setting chan
 		f.healthbar:ClearAllPoints()
 		f.powerbar:ClearAllPoints()
 		f.border.middleart:ClearAllPoints()
+		f.companionborder.middleart:ClearAllPoints()
 		if o.showpowerbar then
 			if o.powerposition <= 2 then -- power on top
 				if o.powerposition == 1 then
@@ -327,6 +370,9 @@ function NotGrid:PositionFrames()
 	local TotalUnits = 0
 	local o = self.o
 
+	local bordersize = self:GetUnitBorderSize()
+	local companionbordersize = self:GetCompanionBorderSize()
+
 	local powermodx = 0 -- so I can interject the width of the powerbar into the positioning calcs without doing a million more conditionals
 	local powermody = 0
 	if o.showpowerbar then
@@ -361,29 +407,29 @@ function NotGrid:PositionFrames()
 				if subgroup == i then
 					f:ClearAllPoints()
 					if o.growthdirection == 1 then -- groups grow left to right, units grow top to bottom
-						f:SetPoint("CENTER",(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)*TotalGroups,-(o.unitheight+powermody+o.unitborder*2+o.unitpadding)*SubGroupCounts[i])
+						f:SetPoint("CENTER",(o.unitwidth+powermodx+bordersize*2+o.unitpadding)*TotalGroups,-(o.unitheight+powermody+bordersize*2+o.unitpadding)*SubGroupCounts[i])
 					elseif o.growthdirection == 2 then -- groups grow left to right, units grow bottom to top
-						f:SetPoint("CENTER",(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)*TotalGroups,(o.unitheight+powermody+o.unitborder*2+o.unitpadding)*SubGroupCounts[i])
+						f:SetPoint("CENTER",(o.unitwidth+powermodx+bordersize*2+o.unitpadding)*TotalGroups,(o.unitheight+powermody+bordersize*2+o.unitpadding)*SubGroupCounts[i])
 					elseif o.growthdirection == 3 then -- groups grow right to left, units grow bottom to top
-						f:SetPoint("CENTER",-(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)*TotalGroups,(o.unitheight+powermody+o.unitborder*2+o.unitpadding)*SubGroupCounts[i])
+						f:SetPoint("CENTER",-(o.unitwidth+powermodx+bordersize*2+o.unitpadding)*TotalGroups,(o.unitheight+powermody+bordersize*2+o.unitpadding)*SubGroupCounts[i])
 					elseif o.growthdirection == 4 then -- groups grow right to left, units grow top to bottom
-						f:SetPoint("CENTER",-(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)*TotalGroups,-(o.unitheight+powermody+o.unitborder*2+o.unitpadding)*SubGroupCounts[i]) -- i do subgroup -1 so group 1 will be 0 and be at 0 offset
+						f:SetPoint("CENTER",-(o.unitwidth+powermodx+bordersize*2+o.unitpadding)*TotalGroups,-(o.unitheight+powermody+bordersize*2+o.unitpadding)*SubGroupCounts[i]) -- i do subgroup -1 so group 1 will be 0 and be at 0 offset
 					elseif o.growthdirection == 5 then -- groups grow top to bottom, units grow left to right
-						f:SetPoint("CENTER",(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)*SubGroupCounts[i],-(o.unitheight+powermody+o.unitborder*2+o.unitpadding)*TotalGroups)
+						f:SetPoint("CENTER",(o.unitwidth+powermodx+bordersize*2+o.unitpadding)*SubGroupCounts[i],-(o.unitheight+powermody+bordersize*2+o.unitpadding)*TotalGroups)
 					elseif o.growthdirection == 6 then -- groups grow bottom to top, units grow left to right
-						f:SetPoint("CENTER",(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)*SubGroupCounts[i],(o.unitheight+powermody+o.unitborder*2+o.unitpadding)*TotalGroups)
+						f:SetPoint("CENTER",(o.unitwidth+powermodx+bordersize*2+o.unitpadding)*SubGroupCounts[i],(o.unitheight+powermody+bordersize*2+o.unitpadding)*TotalGroups)
 					elseif o.growthdirection == 7 then -- groups grow bottom to top, units grow right to left
-						f:SetPoint("CENTER",-(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)*SubGroupCounts[i],(o.unitheight+powermody+o.unitborder*2+o.unitpadding)*TotalGroups)
+						f:SetPoint("CENTER",-(o.unitwidth+powermodx+bordersize*2+o.unitpadding)*SubGroupCounts[i],(o.unitheight+powermody+bordersize*2+o.unitpadding)*TotalGroups)
 					elseif o.growthdirection == 8 then -- groups grow top to bottom, units grow right to left
-						f:SetPoint("CENTER",-(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)*SubGroupCounts[i],-(o.unitheight+powermody+o.unitborder*2+o.unitpadding)*TotalGroups)
+						f:SetPoint("CENTER",-(o.unitwidth+powermodx+bordersize*2+o.unitpadding)*SubGroupCounts[i],-(o.unitheight+powermody+bordersize*2+o.unitpadding)*TotalGroups)
 					elseif o.growthdirection == 9 then -- single top to bottom
-						f:SetPoint("CENTER",0,-(o.unitheight+powermody+o.unitborder*2+o.unitpadding)*TotalUnits)
+						f:SetPoint("CENTER",0,-(o.unitheight+powermody+bordersize*2+o.unitpadding)*TotalUnits)
 					elseif o.growthdirection == 10 then -- single bottom to top
-						f:SetPoint("CENTER",0,(o.unitheight+powermody+o.unitborder*2+o.unitpadding)*TotalUnits)
+						f:SetPoint("CENTER",0,(o.unitheight+powermody+bordersize*2+o.unitpadding)*TotalUnits)
 					elseif o.growthdirection == 11 then -- single left to right
-						f:SetPoint("CENTER",(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)*TotalUnits,0)
+						f:SetPoint("CENTER",(o.unitwidth+powermodx+bordersize*2+o.unitpadding)*TotalUnits,0)
 					elseif o.growthdirection == 12 then -- single right to left
-						f:SetPoint("CENTER",-(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)*TotalUnits,0)
+						f:SetPoint("CENTER",-(o.unitwidth+powermodx+bordersize*2+o.unitpadding)*TotalUnits,0)
 					end
 					f:Show()
 					TotalUnits = TotalUnits+1
@@ -403,19 +449,19 @@ function NotGrid:PositionFrames()
 	if not o.draggable then
 		self.Container:ClearAllPoints()
 		if o.smartcenter == true and (o.growthdirection == 1 or o.growthdirection == 2) then
-				self.Container:SetPoint(o.containerpoint,o.containeroffx-(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)/2*(TotalGroups-1),o.containeroffy)
+				self.Container:SetPoint(o.containerpoint,o.containeroffx-(o.unitwidth+powermodx+bordersize*2+o.unitpadding)/2*(TotalGroups-1),o.containeroffy)
 		elseif o.smartcenter == true and (o.growthdirection == 3 or o.growthdirection == 4) then
-				self.Container:SetPoint(o.containerpoint,o.containeroffx+(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)/2*(TotalGroups-1),o.containeroffy)
+				self.Container:SetPoint(o.containerpoint,o.containeroffx+(o.unitwidth+powermodx+bordersize*2+o.unitpadding)/2*(TotalGroups-1),o.containeroffy)
 		elseif o.smartcenter == true and (o.growthdirection == 5 or o.growthdirection == 6) then
 				table.sort(SubGroupCounts)
-				self.Container:SetPoint(o.containerpoint,o.containeroffx-(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)/2*(SubGroupCounts[10]-1),o.containeroffy)
+				self.Container:SetPoint(o.containerpoint,o.containeroffx-(o.unitwidth+powermodx+bordersize*2+o.unitpadding)/2*(SubGroupCounts[10]-1),o.containeroffy)
 		elseif o.smartcenter == true and (o.growthdirection == 7 or o.growthdirection == 8) then
 				table.sort(SubGroupCounts)
-				self.Container:SetPoint(o.containerpoint,o.containeroffx+(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)/2*(SubGroupCounts[10]-1),o.containeroffy)
+				self.Container:SetPoint(o.containerpoint,o.containeroffx+(o.unitwidth+powermodx+bordersize*2+o.unitpadding)/2*(SubGroupCounts[10]-1),o.containeroffy)
 		elseif o.smartcenter == true and o.growthdirection == 11 then
-			self.Container:SetPoint(o.containerpoint,o.containeroffx-(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)/2*(TotalUnits-1),o.containeroffy)
+			self.Container:SetPoint(o.containerpoint,o.containeroffx-(o.unitwidth+powermodx+bordersize*2+o.unitpadding)/2*(TotalUnits-1),o.containeroffy)
 		elseif o.smartcenter == true and o.growthdirection == 12 then
-			self.Container:SetPoint(o.containerpoint,o.containeroffx+(o.unitwidth+powermodx+o.unitborder*2+o.unitpadding)/2*(TotalUnits-1),o.containeroffy)
+			self.Container:SetPoint(o.containerpoint,o.containeroffx+(o.unitwidth+powermodx+bordersize*2+o.unitpadding)/2*(TotalUnits-1),o.containeroffy)
 		else
 			self.Container:SetPoint(o.containerpoint,o.containeroffx,o.containeroffy)
 		end

@@ -119,6 +119,17 @@ local DefaultOptions = {
 
 	["draggable"] = false,
 	["showmenuhint"] = true,
+
+	-- Companions
+	["companionborder"] = 2,
+	["highlightcompanionborder"] = false,
+	["highlightcompanionname"] = false,
+	["highlightcompanion"] = false,
+	["companioncolor"] = {255/255,255/255,0/255,1},
+	["highlightyourcompanion"] = false,
+	["yourcompanioncolor"] = {255/255,0/255,255/255,1},
+	["highlightplayer"] = false,
+	["playercolor"] = {0/255,255/255,255/255,1},
 }
 
 function NotGrid:SetDefaultOptions() -- this will run on initialization and make sure everything is set. We can also use it if we wipe the NotGridOptions table and want to load it up with defaults
@@ -156,6 +167,8 @@ function SlashCmdList.NOTGRID(msg, editbox)
 			NotGridOptions[key] = value
 		end
 		ReloadUI() -- we have to reloadui to make the config menu update as well
+	elseif msg == "scan" or msg == "companion" then
+		NotGriend_ClientRequest()
 	elseif msg == "grid" then
 		NotGrid.o.unithealthbartexture = "Interface\\AddOns\\NotGrid\\media\\GridGradient"
 		NotGrid.o.unithealthbarbgtexture = "Interface\\AddOns\\NotGrid\\media\\GridGradient"

@@ -410,6 +410,43 @@ local menuarray = {
 
 	{text = "",},
 
+	--  COMPANION START
+
+	{text = "Companions",},
+	{text = L["Companion/Player Border"],
+	 toggle = "highlightcompanionborder",
+	 slider = {
+		 key = "companionborder",
+		 minval = 2,
+		 maxval = 20,
+	 },
+	},
+	{text = L["Companion/Player Name"],
+	 toggle = "highlightcompanionname",
+	},
+	{text = L["Highlight Companion"],
+	 toggle = "highlightcompanion",
+	 color = {
+		 key = "companioncolor",
+	 },
+	},
+	{text = L["Highlight Your Companion"],
+	 toggle = "highlightyourcompanion",
+	 color = {
+		 key = "yourcompanioncolor",
+	 },
+	},
+	{text = L["Highlight Player"],
+	 toggle = "highlightplayer",
+	 color = {
+		 key = "playercolor",
+	 },
+	},
+
+	--  COMPANION END
+
+	{text = "",},
+
 	{text = L["Version Checking"],
 	toggle = "versionchecking",
 	},
@@ -927,7 +964,6 @@ end
 -------------------------
 
 function NotGridOptionChange()
-	DEFAULT_CHAT_FRAME:AddMessage("NotGridOptionChange")
 	NotGrid:ConfigUnitFrames()
 	for unitid,_ in NotGrid.UnitFrames do
 		NotGrid:UNIT_MAIN(unitid)
