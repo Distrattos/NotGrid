@@ -58,6 +58,9 @@ L:RegisterTranslations("enUS", function() return {
 ["Healcomm Text Position"] = true,
 ["Version Checking"] = true,
 ["Draggable"] = true,
+["Show Raid Icon"] = true,
+["Raid Icon Size"] = true,
+["Raid Icon Position"] = true,
 
 --Companions related
 ["Skip Companion"] = true,
