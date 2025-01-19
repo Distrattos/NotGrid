@@ -1,7 +1,7 @@
 local L = AceLibrary("AceLocale-2.2"):new("NotGrid")
 
 local DefaultOptions = {
-	["version"] = 1.132, -- will be the commit number from now on.
+	["version"] = 1.456, -- will be the commit number from now on.
 	["versionchecking"] = true,
 
 	["unitwidth"] = 36,
@@ -167,7 +167,8 @@ function SlashCmdList.NOTGRID(msg, editbox)
 			NotGridOptions[key] = value
 		end
 		ReloadUI() -- we have to reloadui to make the config menu update as well
-	elseif msg == "scan" or msg == "companion" then
+	elseif (msg == "scan" or msg == "companion") and NotGrid:IsPlayingWithCompanions() then
+		DEFAULT_CHAT_FRAME:AddMessage("Querying server for companion status")
 		NotGriend_ClientRequest()
 	elseif msg == "grid" then
 		NotGrid.o.unithealthbartexture = "Interface\\AddOns\\NotGrid\\media\\GridGradient"
